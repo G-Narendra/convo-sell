@@ -15,6 +15,7 @@ export default function Home() {
       data: { mode: isVoiceMode ? "voice" : "text" }
     },
     onFinish: (message: any) => {
+      if (!message || typeof message.content !== 'string') return;
       // Find the plain text to speak, excluding KITCHEN_ORDER
       const orderRegex = /<KITCHEN_ORDER>([\s\S]*?)<\/KITCHEN_ORDER>/;
       const cleanContent = message.content.replace(orderRegex, "").trim();
@@ -35,7 +36,8 @@ export default function Home() {
   };
   const chat = useChat(chatConfig) as any;
 
-  const { messages, isLoading, append } = chat;
+  const { messages, sendMessage, status, append = sendMessage } = chat;
+  const isLoading = status === "streaming" || status === "submitted" || chat.isLoading;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
