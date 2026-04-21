@@ -34,10 +34,8 @@ export default function Home() {
       }
     }
   };
-  const chat = useChat(chatConfig) as any;
-
-  const { messages, sendMessage, status, append = sendMessage } = chat;
-  const isLoading = status === "streaming" || status === "submitted" || chat.isLoading;
+  const { messages, status, sendMessage } = useChat(chatConfig) as any;
+  const isLoading = status === "streaming" || status === "submitted";
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -57,8 +55,8 @@ export default function Home() {
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           setIsListening(false);
-          // Automatically append the recognized text as a user message
-          append({ role: "user", content: transcript });
+          // Automatically send the recognized text as a user message
+          sendMessage({ role: "user", content: transcript });
         };
 
         recognitionRef.current.onerror = (event: any) => {
@@ -76,7 +74,7 @@ export default function Home() {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
     }
-  }, [append]);
+  }, [sendMessage]);
 
   const toggleVoiceMode = () => {
     if (!isVoiceMode) {
@@ -284,7 +282,7 @@ export default function Home() {
             onSubmit={(e) => {
               e.preventDefault();
               if (!input.trim()) return;
-              append({ role: 'user', content: input });
+              sendMessage({ role: 'user', content: input });
               setInput("");
             }}
             className="max-w-4xl mx-auto flex flex-col gap-3"

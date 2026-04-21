@@ -41,12 +41,11 @@ Order JSON Schema inside <KITCHEN_ORDER>:
 Maintain an energetic, empathetic, and culturally respectful tone appropriate for Dubai university students.`;
 
   const result = streamText({
-    model: google('gemini-2.0-flash'),
+    model: google('gemini-2.5-flash'),
     messages,
     system: systemPrompt,
     temperature: 0.7,
   });
 
-  // @ts-ignore
-  return result.toDataStreamResponse ? result.toDataStreamResponse() : (result as any).toAIStreamResponse ? (result as any).toAIStreamResponse() : (result as any).toTextStreamResponse();
+  return result.toTextStreamResponse();
 }
