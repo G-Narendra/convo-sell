@@ -47,5 +47,6 @@ Maintain an energetic, empathetic, and culturally respectful tone appropriate fo
     temperature: 0.7,
   });
 
-  return result.toDataStreamResponse();
+  // @ts-ignore
+  return result.toDataStreamResponse ? result.toDataStreamResponse() : (result as any).toAIStreamResponse ? (result as any).toAIStreamResponse() : (result as any).toTextStreamResponse();
 }

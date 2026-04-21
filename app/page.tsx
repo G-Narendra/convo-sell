@@ -8,12 +8,13 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Home() {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [input, setInput] = useState("");
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+  const chatConfig: any = {
     body: {
       data: { mode: isVoiceMode ? "voice" : "text" }
     },
-    onFinish: (message) => {
+    onFinish: (message: any) => {
       // Find the plain text to speak, excluding KITCHEN_ORDER
       const orderRegex = /<KITCHEN_ORDER>([\s\S]*?)<\/KITCHEN_ORDER>/;
       const cleanContent = message.content.replace(orderRegex, "").trim();
@@ -31,7 +32,10 @@ export default function Home() {
         window.speechSynthesis.speak(utterance);
       }
     }
-  });
+  };
+  const chat = useChat(chatConfig) as any;
+
+  const { messages, isLoading, append } = chat;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -105,7 +109,7 @@ export default function Home() {
   }, [messages]);
 
   // Check for specialized KITCHEN_ORDER strings from assistant
-  const processedMessages = messages.map((msg) => {
+  const processedMessages = (messages || []).map((msg: any) => {
     if (msg.role === "assistant") {
       const orderRegex = /<KITCHEN_ORDER>([\s\S]*?)<\/KITCHEN_ORDER>/;
       const match = msg.content.match(orderRegex);
@@ -228,7 +232,7 @@ export default function Home() {
           )}
 
           <AnimatePresence initial={false}>
-            {processedMessages.map((msg) => (
+            {processedMessages?.map((msg: any) => (
               msg.content.trim() && (
                 <motion.div
                   key={msg.id}
@@ -276,12 +280,10 @@ export default function Home() {
         <div className="p-4 md:p-6 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent">
           <form 
             onSubmit={(e) => {
-              if (isVoiceMode) {
-                 e.preventDefault(); // disable manual typing if in voice mode or just let them type? 
-                 handleSubmit(e); // Better to let them text if they type
-              } else {
-                 handleSubmit(e);
-              }
+              e.preventDefault();
+              if (!input.trim()) return;
+              append({ role: 'user', content: input });
+              setInput("");
             }}
             className="max-w-4xl mx-auto flex flex-col gap-3"
           >
@@ -312,7 +314,7 @@ export default function Home() {
               ) : (
                 <input
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   disabled={isVoiceMode}
                   className="flex-1 bg-transparent pl-6 py-4 focus:outline-none font-medium text-neutral-100 placeholder:text-neutral-500 disabled:opacity-50"
                   placeholder={kitchenOrder ? "Chat while you wait..." : "Type your cravings (e.g. stressed and hungry)..."}
