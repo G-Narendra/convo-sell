@@ -1,15 +1,8 @@
-//import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createOpenAI } from '@ai-sdk/openai';
+import { google } from '@ai-sdk/google';
 import { streamText, createUIMessageStreamResponse, convertToModelMessages } from 'ai';
 import { detectInjection, sanitizeInput, validateOutput } from '@/app/lib/guardrails';
 
 export const maxDuration = 30;
-
-//const google = createGoogleGenerativeAI({
-//  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-//});
-
-const groq = createOpenAI({ baseURL: 'https://api.groq.com/openai/v1', apiKey: process.env.GROQ_API_KEY });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Simple in-memory rate limiter (resets on server restart — suitable for demo)
@@ -180,13 +173,11 @@ Maintain an energetic, empathetic, and culturally respectful tone appropriate fo
 
   // ── Stream response ────────────────────────────────────────────────────────
   const result = streamText({
-    //model: google('models/gemini-2.0-flash'),
-    model: groq('llama-3.3-70b-versatile'),
+    model: google('gemini-2.5-flash'),
     messages: modelMessages,   // converted ModelMessage[] format
     system: systemPrompt,
     temperature: 0.7,
   });
-
   return createUIMessageStreamResponse({
     stream: result.toUIMessageStream({
       onFinish: ({ responseMessage }) => {
