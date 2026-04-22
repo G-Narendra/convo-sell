@@ -1,0 +1,114 @@
+Dish & Origin	Cuisine Type	Prep Time (mins)	Avg. Price (AED)
+Chicken Shawarma (UAE)	Middle Eastern	15	18
+Falafel Wrap (Lebanon)	Middle Eastern	10	12
+Hummus Bowl (Lebanon)	Middle Eastern	5	15
+Mansaf (Jordan)	Middle Eastern	45	35
+Koshari (Egypt)	Middle Eastern	20	16
+Grilled Kebab Platter (UAE)	Middle Eastern	25	32
+Fattoush Salad (Lebanon)	Middle Eastern	10	14
+Manakeesh Zaatar (Lebanon)	Middle Eastern	12	10
+Chicken Kabsa (Saudi Arabia)	Middle Eastern	40	28
+Baba Ganoush (Lebanon)	Middle Eastern	15	13
+Chicken Biryani (India)	South Asian	35	22
+Butter Chicken (India)	South Asian	30	25
+Masala Dosa (India)	South Asian	20	16
+Paneer Tikka (India)	South Asian	25	20
+Samosa (India)	South Asian	15	8
+Chicken Tikka Masala (India)	South Asian	30	24
+Dal Tadka (India)	South Asian	25	14
+Nihari (Pakistan)	South Asian	50	30
+Haleem (Pakistan)	South Asian	45	26
+Chicken Karahi (Pakistan)	South Asian	30	28
+Kottu Roti (Sri Lanka)	South Asian	20	18
+String Hoppers (Sri Lanka)	South Asian	25	15
+Pad Thai (Thailand)	Southeast Asian	15	20
+Nasi Goreng (Indonesia)	Southeast Asian	12	18
+Chicken Satay (Malaysia)	Southeast Asian	20	16
+Pho (Vietnam)	Southeast Asian	30	22
+Laksa (Malaysia)	Southeast Asian	25	24
+Adobo Chicken (Philippines)	Southeast Asian	35	20
+Tom Yum Soup (Thailand)	Southeast Asian	20	16
+Spring Rolls (Vietnam)	Southeast Asian	15	12
+Rendang (Indonesia)	Southeast Asian	45	28
+Hainanese Chicken Rice (Singapore)	Southeast Asian	30	22
+Chicken Fried Rice (China)	East Asian	12	18
+Kung Pao Chicken (China)	East Asian	15	22
+Dim Sum Platter (China)	East Asian	20	24
+Ramen (Japan)	East Asian	25	26
+Sushi Platter (Japan)	East Asian	30	35
+Teriyaki Chicken (Japan)	East Asian	20	24
+Bibimbap (Korea)	East Asian	15	22
+Kimchi Fried Rice (Korea)	East Asian	12	18
+Korean Fried Chicken (Korea)	East Asian	25	26
+Gyoza (Japan)	East Asian	15	14
+Margherita Pizza (Italy)	European	15	24
+Pasta Carbonara (Italy)	European	20	26
+Lasagna (Italy)	European	40	30
+Fish & Chips (UK)	European	20	28
+Beef Burger (USA/UK)	European	15	22
+Chicken Schnitzel (Germany)	European	20	26
+Moussaka (Greece)	European	45	28
+Paella (Spain)	European	35	32
+French Fries (France)	European	10	10
+Caesar Salad (Italy)	European	8	16
+Jollof Rice (Nigeria)	African	30	18
+Suya (Nigeria)	African	20	16
+Ugali with Sukuma (Kenya)	African	25	14
+Bunny Chow (South Africa)	African	20	20
+Couscous (Morocco)	African	25	22
+Injera with Doro Wat (Ethiopia)	African	40	24
+Bobotie (South Africa)	African	35	26
+Buffalo Wings (USA)	American	20	22
+Mac & Cheese (USA)	American	15	16
+BBQ Ribs (USA)	American	45	38
+Pancakes (USA)	American	10	14
+Philly Cheesesteak (USA)	American	15	24
+Loaded Nachos (Mexico)	Mexican	12	18
+Chicken Quesadilla (Mexico)	Mexican	15	16
+Tacos (Mexico)	Mexican	12	14
+Onion Rings (USA)	American	10	12
+Mozzarella Sticks (Italy)	European	12	14
+Chicken Nuggets (USA)	American	10	12
+Tiramisu (Italy)	European	15	18
+Kunafa (Middle East)	Middle Eastern	20	16
+Baklava (Turkey)	Middle Eastern	25	14
+Gulab Jamun (India)	South Asian	20	10
+Mango Sticky Rice (Thailand)	Southeast Asian	15	14
+Churros (Spain)	European	12	12
+Cheesecake (USA)	American	10	20
+Brownie (USA)	American	8	10
+Espresso (Italy)	Beverage	3	8
+Cappuccino (Italy)	Beverage	5	12
+Latte (Italy)	Beverage	5	14
+Americano (USA)	Beverage	3	10
+Flat White (Australia)	Beverage	5	13
+Mocha (USA)	Beverage	6	16
+Caramel Macchiato (Italy)	Beverage	6	18
+Turkish Coffee (Turkey)	Beverage	8	12
+Karak Chai (UAE)	Beverage	5	6
+Masala Chai (India)	Beverage	8	8
+Green Tea (China)	Beverage	5	6
+Hot Chocolate (Europe)	Beverage	5	12
+Iced Latte (Italy)	Beverage	5	15
+Iced Americano (USA)	Beverage	4	12
+Frappe (Greece)	Beverage	5	16
+Mango Lassi (India)	Beverage	5	12
+Strawberry Shake (USA)	Beverage	5	14
+Chocolate Shake (USA)	Beverage	5	14
+Vanilla Shake (USA)	Beverage	5	14
+Oreo Shake (USA)	Beverage	6	16
+Smoothie Bowl (USA)	Beverage	8	18
+Fresh Orange Juice (Global)	Beverage	5	10
+Fresh Apple Juice (Global)	Beverage	5	10
+Pomegranate Juice (Middle East)	Beverage	6	12
+Lemonade (Global)	Beverage	5	8
+Mint Lemonade (Middle East)	Beverage	6	10
+Mineral Water 500ml (Global)	Beverage	1	3
+Mineral Water 1L (Global)	Beverage	1	5
+Sparkling Water (Global)	Beverage	1	6
+Coca-Cola (USA)	Beverage	1	5
+Pepsi (USA)	Beverage	1	5
+Sprite (USA)	Beverage	1	5
+Fanta (Global)	Beverage	1	5
+Red Bull (Austria)	Beverage	1	10
+Iced Tea (Global)	Beverage	1	6

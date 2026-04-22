@@ -10,19 +10,41 @@ import {
   Mic,
   MicOff,
   Volume2,
-  CheckCircle,
-  XCircle,
-  ShoppingBag,
+  VolumeX,
+  ShoppingCart,
+  Check,
+  X,
+  Cpu,
+  Shield,
+  ShieldAlert,
   ShieldCheck,
+  ShoppingBag,
 } from "lucide-react";
 import { detectInjection, sanitizeInput } from "@/app/lib/guardrails";
 import { motion, AnimatePresence } from "framer-motion";
 import CafeteriaStatus from "./components/CafeteriaStatus";
 import WaitTimeGames from "./components/WaitTimeGames";
 
-// ─────────────────────────────────────────────────────────
+// Custom scrollbar styles
+const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #525252;
+  }
+`;
+
+// ---------------------------------------------------------
 // Types
-// ─────────────────────────────────────────────────────────
+// ---------------------------------------------------------
 interface UpsellSuggestion {
   item: string;
   price: string;
@@ -34,10 +56,10 @@ interface UpsellHistoryEntry {
   accepted: boolean;
 }
 
-// ─────────────────────────────────────────────────────────
-// UpsellCard — rendered inline in the chat when the AI
-// proposes an add-on with a pairing reason
-// ─────────────────────────────────────────────────────────
+// ---------------------------------------------------------
+// Components
+// ---------------------------------------------------------
+
 function UpsellCard({
   suggestion,
   onAccept,
@@ -53,92 +75,112 @@ function UpsellCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 8 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-950/30 p-4 backdrop-blur-sm"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`bg-amber-500/10 border border-amber-500/30 p-5 rounded-2xl max-w-[90%] mt-2 ${
+        resolved ? "opacity-50 grayscale" : ""
+      }`}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-2">
-        <ShoppingBag className="text-amber-400" size={15} />
-        <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-          Suggested Add-on
-        </span>
-        <span className="ml-auto text-xs font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full">
-          {suggestion.price}
-        </span>
+      <div className="flex items-start gap-3 mb-3">
+        <div className="bg-amber-500 text-black p-2 rounded-lg">
+          <Sparkles size={18} />
+        </div>
+        <div>
+          <h3 className="font-bold text-amber-500">How about a pairing?</h3>
+          <p className="text-sm text-neutral-300 leading-relaxed">
+            {suggestion.reason}
+          </p>
+        </div>
       </div>
 
-      {/* Item name */}
-      <p className="text-sm font-semibold text-neutral-100 mb-1">
-        {suggestion.item}
-      </p>
-
-      {/* Pairing reason */}
-      <p className="text-xs text-neutral-400 italic leading-relaxed mb-3">
-        💡 {suggestion.reason}
-      </p>
-
-      {/* Accept / Decline */}
-      {resolved ? (
-        <div
-          className={`flex items-center gap-2 text-xs font-medium ${
-            accepted ? "text-green-400" : "text-neutral-500"
-          }`}
-        >
-          {accepted ? (
-            <>
-              <CheckCircle size={14} /> Added to your order!
-            </>
-          ) : (
-            <>
-              <XCircle size={14} /> No thanks — noted for next time.
-            </>
-          )}
-        </div>
-      ) : (
+      {!resolved ? (
         <div className="flex gap-2">
           <button
             onClick={onAccept}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold py-2 rounded-xl transition-colors"
+            className="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl text-xs transition-colors"
           >
-            <CheckCircle size={13} /> Yes, add it!
+            Add {suggestion.item} ({suggestion.price})
           </button>
           <button
             onClick={onDecline}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-medium py-2 rounded-xl transition-colors"
+            className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 rounded-xl text-xs transition-colors"
           >
-            <XCircle size={13} /> No thanks
+            No thanks
           </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+          {accepted ? (
+            <span className="text-amber-500 flex items-center gap-1">
+              <Check size={14} /> Added to order
+            </span>
+          ) : (
+            <span className="text-neutral-500 flex items-center gap-1">
+              <X size={14} /> Declined
+            </span>
+          )}
         </div>
       )}
     </motion.div>
   );
 }
 
-// ─────────────────────────────────────────────────────────
-// Main Page
-// ─────────────────────────────────────────────────────────
+function KitchenOrderCard({ order }: { order: any }) {
+  return (
+    <div className="space-y-4">
+      <div className="bg-neutral-800/80 p-5 rounded-2xl border border-neutral-700">
+        <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-4">Confirmed Items</h3>
+        <ul className="space-y-3">
+          {order.items.map((item: any, i: number) => (
+            <li key={i} className="flex justify-between items-start">
+              <div>
+                <p className="font-bold text-orange-400 text-sm">{item.name}</p>
+                {item.notes && <p className="text-[10px] text-neutral-500 italic mt-0.5">{item.notes}</p>}
+              </div>
+              <span className="bg-neutral-700 text-neutral-300 text-[10px] font-bold px-2 py-0.5 rounded">x{item.quantity}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-neutral-800/50 p-3 rounded-xl border border-neutral-800">
+          <p className="text-[10px] text-neutral-500 uppercase font-bold mb-1">Spice Level</p>
+          <p className="text-sm font-medium">{order.preferences?.spice_level || "Standard"}</p>
+        </div>
+        <div className="bg-neutral-800/50 p-3 rounded-xl border border-neutral-800">
+          <p className="text-[10px] text-neutral-500 uppercase font-bold mb-1">Mood</p>
+          <p className="text-sm font-medium capitalize">{order.mood || "Standard"}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------
+// Main Component
+// ---------------------------------------------------------
 export default function Home() {
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [input, setInput] = useState("");
-
-  // ── Guardrail error state ─────────────────────────────
   const [guardrailError, setGuardrailError] = useState<string | null>(null);
 
-  // ── Upsell state ──────────────────────────────────────
-  const [upsellHistory, setUpsellHistory] = useState<UpsellHistoryEntry[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      return JSON.parse(localStorage.getItem("mdx_upsell_history") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  // States
+  const [kitchenOrder, setKitchenOrder] = useState<any>(null);
+  const [cart, setCart] = useState<{ items: { name: string; quantity: number }[] } | null>(null);
+  const [detectedMood, setDetectedMood] = useState<string>("Analyzing...");
+  const [liveMood, setLiveMood] = useState<string>("Analyzing...");
+  const [upsellHistory, setUpsellHistory] = useState<UpsellHistoryEntry[]>([]);
+  const [resolvedUpsells, setResolvedUpsells] = useState<Record<string, { accepted: boolean }>>({});
 
-  const [resolvedUpsells, setResolvedUpsells] = useState<
-    Record<string, { accepted: boolean }>
-  >({});
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("mdx_upsell_history");
+      if (saved) setUpsellHistory(JSON.parse(saved));
+    } catch (e) {
+      console.error("Failed to load upsell history", e);
+    }
+  }, []);
 
   const persistUpsellHistory = useCallback((next: UpsellHistoryEntry[]) => {
     setUpsellHistory(next);
@@ -146,6 +188,14 @@ export default function Home() {
       localStorage.setItem("mdx_upsell_history", JSON.stringify(next));
     }
   }, []);
+
+  // -- Mood Debounce -------------------------------------
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDetectedMood(liveMood);
+    }, 2000); 
+    return () => clearTimeout(timer);
+  }, [liveMood]);
 
   const chatInputRef = useRef<HTMLInputElement>(null);
 
@@ -157,85 +207,97 @@ export default function Home() {
       },
     },
     onFinish: (message: any) => {
+      console.log("DEBUG: onFinish message object:", JSON.stringify(message, null, 2));
       if (!message) return;
-      // SDK v6: content lives in parts[].text, not message.content directly
-      const rawText = typeof message.content === "string"
-        ? message.content
-        : (message.parts || [])
-            .filter((p: any) => p.type === "text")
-            .map((p: any) => p.text ?? "")
-            .join("");
+
+      // Robust extraction for SDK v6 UIMessage
+      let rawText = "";
+      if (message.content && typeof message.content === "string") {
+        rawText = message.content;
+      }
+      
+      // If content is empty, try parts (standard for UIMessage)
+      if (!rawText && Array.isArray(message.parts)) {
+        rawText = message.parts
+          .map((p: any) => {
+            if (typeof p === "string") return p;
+            if (p.type === "text") return p.text ?? "";
+            return "";
+          })
+          .join("");
+      }
+
+      // Final fallback: check for a 'text' property
+      if (!rawText && message.text) rawText = message.text;
+
+      // Clean the text for speech (remove tags and asterisks)
       const cleanContent = rawText
         .replace(/<KITCHEN_ORDER>[\s\S]*?<\/KITCHEN_ORDER>/g, "")
         .replace(/<UPSELL>[\s\S]*?<\/UPSELL>/g, "")
+        .replace(/<MOOD>[\s\S]*?<\/MOOD>/g, "")
+        .replace(/\*/g, "") // Remove ALL asterisks
         .trim();
 
+      console.log("DEBUG: Extracted rawText:", rawText);
+      console.log("DEBUG: Cleaned for speech:", cleanContent);
+
       if (isVoiceMode && cleanContent && "speechSynthesis" in window) {
+        console.log("Speaking now...");
         const utterance = new SpeechSynthesisUtterance(cleanContent);
-        const voices = window.speechSynthesis.getVoices();
-        const englishVoice = voices.find(
-          (v) =>
-            v.lang.startsWith("en") &&
-            (v.name.includes("Google") ||
-              v.name.includes("Natural") ||
-              v.name.includes("Female"))
-        );
-        if (englishVoice) utterance.voice = englishVoice;
-        utterance.pitch = 1;
-        utterance.rate = 1.05;
+        
+        utterance.onend = () => {
+          if (isVoiceMode) setTimeout(startListening, 300);
+        };
+        window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utterance);
+        utterance.onend = () => { if (isVoiceMode) setTimeout(startListening, 300); };
       }
     },
   };
 
   const { messages, status, sendMessage } = useChat(chatConfig) as any;
   const isLoading = status === "streaming" || status === "submitted";
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  const [kitchenOrder, setKitchenOrder] = useState<any>(null);
+  const safeSendMessage = useCallback((text: string) => {
+    setGuardrailError(null);
+    const sanitized = sanitizeInput(text);
+    const check = detectInjection(sanitized);
+    if (!check.safe) {
+      setGuardrailError(check.reason ?? "Message blocked.");
+      setTimeout(() => setGuardrailError(null), 5000);
+      if (isVoiceMode) startListening();
+      return;
+    }
+    sendMessage({ text: sanitized });
+  }, [sendMessage, isVoiceMode]);
 
-  // ── Guardrail-checked send helper ─────────────────────
-  // Must be defined BEFORE the speech recognition useEffect that depends on it.
-  const safeSendMessage = useCallback(
-    (text: string) => {
-      setGuardrailError(null);
-      const sanitized = sanitizeInput(text);
-      const check = detectInjection(sanitized);
-      if (!check.safe) {
-        setGuardrailError(check.reason ?? "Message blocked by security guardrail.");
-        setTimeout(() => setGuardrailError(null), 5000);
-        return;
-      }
-      sendMessage({ text: sanitized });
-    },
-    [sendMessage]
-  );
+  const startListening = useCallback(() => {
+    if (!recognitionRef.current) return;
+    try { recognitionRef.current.start(); setIsListening(true); } catch (e) {}
+  }, []);
 
-  // ── Speech Recognition ────────────────────────────────
+  const stopListening = useCallback(() => {
+    if (!recognitionRef.current) return;
+    try { recognitionRef.current.stop(); } catch (e) {}
+    setIsListening(false);
+  }, []);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = false;
-        recognitionRef.current.interimResults = false;
         recognitionRef.current.lang = "en-US";
-
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           setIsListening(false);
-          safeSendMessage(transcript);
+          // 2 seconds extra delay as requested
+          setTimeout(() => { safeSendMessage(transcript); }, 2000);
         };
-
-        recognitionRef.current.onerror = (event: any) => {
-          console.error("Speech recognition error", event.error);
-          setIsListening(false);
-        };
-
+        recognitionRef.current.onerror = () => setIsListening(false);
         recognitionRef.current.onend = () => setIsListening(false);
       }
     }
@@ -243,199 +305,200 @@ export default function Home() {
   }, [safeSendMessage]);
 
   const toggleVoiceMode = () => {
-    if (!isVoiceMode) window.speechSynthesis.cancel();
+    if (!isVoiceMode) {
+      window.speechSynthesis.cancel();
+      setTimeout(startListening, 500);
+    } else {
+      stopListening();
+    }
     setIsVoiceMode(!isVoiceMode);
   };
 
   const toggleListening = () => {
-    if (!recognitionRef.current) {
-      alert("Speech recognition is not supported in this browser.");
-      return;
-    }
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      window.speechSynthesis.cancel();
-      try {
-        recognitionRef.current.start();
-        setIsListening(true);
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    if (isListening) stopListening();
+    else { window.speechSynthesis.cancel(); startListening(); }
   };
 
-  // ── Auto-scroll ───────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ── Message Processing ────────────────────────────────
-  const kitchenOrderRegex = /<KITCHEN_ORDER>([\s\S]*?)<\/KITCHEN_ORDER>/;
-  const upsellRegex = /<UPSELL>([\s\S]*?)<\/UPSELL>/;
+  const kitchenOrderRegex = /<KITCHEN_ORDER>([\s\S]*?)<\/KITCHEN_ORDER>/g;
+  const upsellRegex = /<UPSELL>([\s\S]*?)<\/UPSELL>/g;
+  const moodRegex = /<MOOD>([\s\S]*?)<\/MOOD>/g;
+  const cartRegex = /<CART>([\s\S]*?)<\/CART>/g;
 
   const processedMessages = (messages || []).map((msg: any) => {
     if (msg.role !== "assistant") return msg;
-
-    // SDK v6: text lives in parts[].text — fall back to msg.content for safety
-    let content: string = typeof msg.content === "string"
+    let content = (msg.content && typeof msg.content === "string" && msg.content.length > 0)
       ? msg.content
       : (msg.parts || [])
           .filter((p: any) => p.type === "text")
           .map((p: any) => p.text ?? "")
           .join("");
-
     let upsell: UpsellSuggestion | null = null;
-
-    const orderMatch = content.match(kitchenOrderRegex);
-    if (orderMatch) {
-      try {
-        const parsedOrder = JSON.parse(orderMatch[1]);
-        if (!kitchenOrder) setTimeout(() => setKitchenOrder(parsedOrder), 0);
-      } catch (e) {
-        console.error("Failed to parse kitchen order", e);
-      }
-      content = content.replace(kitchenOrderRegex, "").trim();
+    const orderMatches = [...content.matchAll(kitchenOrderRegex)];
+    if (orderMatches.length > 0) {
+      try { const lastOrder = JSON.parse(orderMatches[orderMatches.length - 1][1]); setTimeout(() => setKitchenOrder(lastOrder), 0); } catch (e) {}
     }
-
-    const upsellMatch = content.match(upsellRegex);
-    if (upsellMatch) {
-      try {
-        upsell = JSON.parse(upsellMatch[1]) as UpsellSuggestion;
-      } catch (e) {
-        console.error("Failed to parse upsell", e);
-      }
-      content = content.replace(upsellRegex, "").trim();
+    const cartMatches = [...content.matchAll(cartRegex)];
+    if (cartMatches.length > 0) {
+      try { const lastCart = JSON.parse(cartMatches[cartMatches.length - 1][1]); setTimeout(() => setCart(lastCart), 0); } catch (e) {}
     }
-
+    const upsellMatches = [...content.matchAll(upsellRegex)];
+    if (upsellMatches.length > 0) {
+      try { upsell = JSON.parse(upsellMatches[upsellMatches.length - 1][1]); } catch (e) {}
+    }
+    const moodMatches = [...content.matchAll(moodRegex)];
+    if (moodMatches.length > 0) {
+      const lastMood = moodMatches[moodMatches.length - 1][1].trim();
+      setTimeout(() => setLiveMood(lastMood), 0);
+    }
+    content = content.replace(kitchenOrderRegex, "").replace(upsellRegex, "").replace(moodRegex, "").replace(cartRegex, "").trim();
     return { ...msg, content, upsell };
   });
 
-  // ── Upsell handlers ───────────────────────────────────
   const handleUpsellAccept = (msgId: string, item: string) => {
     setResolvedUpsells((prev) => ({ ...prev, [msgId]: { accepted: true } }));
     persistUpsellHistory([...upsellHistory, { item, accepted: true }]);
-    // Upsell responses are system-generated — bypass guardrail check
     sendMessage({ text: `Yes please, add the ${item} to my order!` });
   };
 
   const handleUpsellDecline = (msgId: string, item: string) => {
     setResolvedUpsells((prev) => ({ ...prev, [msgId]: { accepted: false } }));
     persistUpsellHistory([...upsellHistory, { item, accepted: false }]);
-    sendMessage({ text: `No thanks, I'll skip the ${item}.` });
+    sendMessage({ text: "No thanks, I'll skip that." });
   };
 
-  // ── Render ────────────────────────────────────────────
   return (
     <div className="flex h-screen bg-neutral-950 text-neutral-100 font-sans overflow-hidden">
-
-      {/* ── Sidebar ── */}
-      <div className="w-1/4 max-w-sm border-r border-neutral-800 bg-neutral-900/50 p-6 flex flex-col justify-between hidden md:flex">
-        <div>
-          {/* Branding */}
+      <style dangerouslySetInnerHTML={{ __html: scrollbarStyles }} />
+      
+      {/* Sidebar */}
+      <div className="w-1/4 max-w-sm border-r border-neutral-800 bg-neutral-900/50 p-6 flex flex-col hidden md:flex h-full">
+        <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
           <div className="flex items-center gap-3 mb-10">
             <div className="bg-orange-500/20 p-2 rounded-xl text-orange-400">
               <Utensils size={28} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
               Global Hub<span className="text-orange-400">@MDX</span>
             </h1>
           </div>
 
-          <div className="space-y-6">
-            {/* Session Context */}
-            <div className="bg-neutral-800/50 p-5 rounded-2xl border border-neutral-800">
-              <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">
-                Live Session Context
-              </h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-500">Mode</span>
-                  <span className={`text-sm font-medium px-2 py-1 rounded-md flex items-center gap-1 ${
-                    isVoiceMode ? "bg-blue-500/20 text-blue-400" : "bg-neutral-800 text-neutral-300"
-                  }`}>
-                    {isVoiceMode ? <><Volume2 size={14} /> Voice</> : "Text"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-neutral-500">Detected Mood</span>
-                  <span className="text-sm font-medium bg-neutral-800 px-2 py-1 rounded-md text-orange-400">
-                    {kitchenOrder?.mood || "Analyzing..."}
-                  </span>
-                </div>
-                {upsellHistory.length > 0 && (
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-800">
-                    <span className="text-sm text-neutral-500">Upsells accepted</span>
-                    <span className="text-sm font-medium text-amber-400">
-                      {upsellHistory.filter((u) => u.accepted).length} / {upsellHistory.length}
-                    </span>
-                  </div>
-                )}
+          <div className="bg-neutral-800/50 p-5 rounded-2xl border border-neutral-800">
+            <h2 className="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">
+              Session Status
+            </h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-neutral-500">Mode</span>
+                <span className={`text-sm font-medium px-2 py-1 rounded-md flex items-center gap-1 ${
+                  isVoiceMode ? "bg-blue-500/20 text-blue-400" : "bg-neutral-800 text-neutral-300"
+                }`}>
+                  {isVoiceMode ? <><Volume2 size={14} /> Voice</> : "Text"}
+                </span>
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-neutral-500">Detected Mood</span>
+                <span className="text-sm font-medium bg-neutral-800 px-2 py-1 rounded-md text-orange-400">
+                  {detectedMood}
+                </span>
+              </div>
+              {upsellHistory.length > 0 && (
+                <div className="flex items-center justify-between pt-2 border-t border-neutral-800">
+                  <span className="text-sm text-neutral-500">Upsells accepted</span>
+                  <span className="text-sm font-medium text-amber-400">
+                    {upsellHistory.filter((u) => u.accepted).length} / {upsellHistory.length}
+                  </span>
+                </div>
+              )}
             </div>
-
-            {/* Kitchen Order */}
-            <AnimatePresence>
-              {kitchenOrder && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl"
-                >
-                  <div className="flex items-center gap-2 mb-3 text-orange-400">
-                    <ChefHat size={20} />
-                    <h2 className="font-semibold">Order to Kitchen</h2>
-                  </div>
-                  <ul className="space-y-2 mb-4">
-                    {kitchenOrder.items?.map((item: any, idx: number) => (
-                      <li key={idx} className="text-sm flex flex-col">
-                        <span className="text-neutral-300 font-medium">
-                          {item.quantity}x {item.name}
-                        </span>
-                        {item.notes && (
-                          <span className="text-xs text-neutral-500 italic pl-4">
-                            Note: {item.notes}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="text-xs text-neutral-500 pt-3 border-t border-orange-500/20">
-                    Spice: {kitchenOrder.preferences?.spice_level || "Standard"} | Alerts:{" "}
-                    {kitchenOrder.preferences?.allergies?.join(", ") || "None"}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* ── Enhancement 3: Wait Time Games (sidebar, after order) ── */}
-            <AnimatePresence>
-              {kitchenOrder && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <WaitTimeGames />
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
+
+          {/* Real-time Cart */}
+          <AnimatePresence>
+            {(cart?.items?.length ?? 0) > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl"
+              >
+                <h2 className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <ShoppingCart size={14} /> Current Cart
+                </h2>
+                <div className="space-y-2">
+                  {cart?.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-center text-sm">
+                      <span className="text-neutral-300">{item.name}</span>
+                      <span className="bg-orange-500/20 text-orange-400 px-1.5 rounded font-bold">x{item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Kitchen Order (Final) */}
+          <AnimatePresence>
+            {kitchenOrder && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-orange-500/10 border border-orange-500/20 p-5 rounded-2xl"
+              >
+                <div className="flex items-center gap-2 mb-3 text-orange-400">
+                  <ChefHat size={20} />
+                  <h2 className="font-semibold">Order to Kitchen</h2>
+                </div>
+                <ul className="space-y-2 mb-4">
+                  {kitchenOrder.items?.map((item: any, idx: number) => (
+                    <li key={idx} className="text-sm flex flex-col">
+                      <span className="text-neutral-300 font-medium">
+                        {item.quantity}x {item.name}
+                      </span>
+                      {item.notes && (
+                        <span className="text-xs text-neutral-500 italic pl-4">
+                          Note: {item.notes}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+                <div className="text-xs text-neutral-500 pt-3 border-t border-orange-500/20">
+                  Spice: {kitchenOrder.preferences?.spice_level || "Standard"} | Alerts:{" "}
+                  {kitchenOrder.preferences?.allergies?.join(", ") || "None"}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Wait Time Games */}
+          <AnimatePresence>
+            {kitchenOrder && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <WaitTimeGames />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-emerald-500/80">
-            <ShieldCheck size={13} />
-            <span>Guardrails Active</span>
+        <div className="pt-6 mt-auto border-t border-neutral-800/50 text-[10px] text-neutral-600 flex justify-between items-center">
+          <span>MDX Dubai Campus Host</span>
+          <div className="flex gap-2">
+            <span className="flex items-center gap-1"><Shield size={10} /> Secure</span>
+            <span className="flex items-center gap-1"><Cpu size={10} /> AI Powered</span>
           </div>
-          <div className="text-xs text-neutral-600">Powered by ConvoSell AI</div>
         </div>
       </div>
 
-      {/* ── Chat Area ── */}
-      <div className="flex-1 flex flex-col relative bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-black">
-
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col relative bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-black overflow-hidden h-full">
+        
         {/* Mobile Header */}
         <div className="md:hidden p-4 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/80 backdrop-blur-md z-10">
           <div className="flex items-center gap-2">
@@ -444,13 +507,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── Enhancement 2: Cafeteria Status Card ── */}
         <CafeteriaStatus onPreOrderClick={() => chatInputRef.current?.focus()} />
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
-
-          {/* Welcome state */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 space-y-6">
           {processedMessages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto opacity-70">
               <Sparkles size={48} className="text-orange-400 mb-6" />
@@ -463,9 +523,7 @@ export default function Home() {
                 <button
                   onClick={() => setIsVoiceMode(false)}
                   className={`px-6 py-3 rounded-full font-medium transition-all ${
-                    !isVoiceMode
-                      ? "bg-orange-500 text-black shadow-lg shadow-orange-500/20"
-                      : "bg-neutral-800 text-neutral-300"
+                    !isVoiceMode ? "bg-orange-500 text-black shadow-lg shadow-orange-500/20" : "bg-neutral-800 text-neutral-300"
                   }`}
                 >
                   Type Order
@@ -473,9 +531,7 @@ export default function Home() {
                 <button
                   onClick={() => setIsVoiceMode(true)}
                   className={`px-6 py-3 rounded-full font-medium flex items-center gap-2 transition-all ${
-                    isVoiceMode
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                      : "bg-neutral-800 text-neutral-300"
+                    isVoiceMode ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "bg-neutral-800 text-neutral-300"
                   }`}
                 >
                   <Volume2 size={18} /> Voice Mode
@@ -484,82 +540,60 @@ export default function Home() {
             </div>
           )}
 
-          {/* ── Enhancement 3: Games panel (mobile, after order) ── */}
           {kitchenOrder && (
             <div className="md:hidden mb-4">
               <WaitTimeGames />
             </div>
           )}
 
-          {/* Messages */}
           <AnimatePresence initial={false}>
-            {processedMessages?.map(
-              (msg: any) => {
-                // SDK v6: extract display text from parts or content
-                const displayText: string = typeof msg.content === "string"
-                  ? msg.content
-                  : (msg.parts || [])
-                      .filter((p: any) => p.type === "text")
-                      .map((p: any) => p.text ?? "")
-                      .join("");
-                return displayText.trim() && (
-                  <motion.div
-                    key={msg.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[85%] md:max-w-[70%] ${
-                        msg.role === "user"
-                          ? "p-4 rounded-3xl bg-neutral-800 text-white rounded-br-sm"
-                          : "flex flex-col"
-                      }`}
-                    >
-                      {msg.role === "assistant" ? (
-                        <>
-                          <div className="p-4 rounded-3xl bg-orange-950/30 border border-orange-500/20 text-neutral-200 rounded-bl-sm">
-                            <div className="flex items-center gap-2 mb-2 text-orange-400">
-                              <Sparkles size={14} />
-                              <span className="text-xs font-semibold uppercase tracking-wider">
-                                AI Host
-                              </span>
-                            </div>
-                            <div className="whitespace-pre-wrap leading-relaxed">
-                              {displayText}
-                            </div>
-                          </div>
+            {processedMessages?.map((msg: any) => {
+              const displayText: string = (msg.content && typeof msg.content === "string" && msg.content.length > 0)
+                ? msg.content
+                : (msg.parts || [])
+                    .filter((p: any) => p.type === "text")
+                    .map((p: any) => p.text ?? "")
+                    .join("");
 
-                          {/* Upsell Card */}
-                          {msg.upsell && (
-                            <UpsellCard
-                              suggestion={msg.upsell}
-                              resolved={!!resolvedUpsells[msg.id]}
-                              accepted={resolvedUpsells[msg.id]?.accepted ?? false}
-                              onAccept={() => handleUpsellAccept(msg.id, msg.upsell.item)}
-                              onDecline={() => handleUpsellDecline(msg.id, msg.upsell.item)}
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <div className="whitespace-pre-wrap leading-relaxed">
-                          {displayText}
+              return displayText.trim() && (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div className={`max-w-[85%] md:max-w-[70%] ${msg.role === "user" ? "p-4 rounded-3xl bg-neutral-800 text-white rounded-br-sm" : "flex flex-col"}`}>
+                    {msg.role === "assistant" ? (
+                      <>
+                        <div className="p-4 rounded-3xl bg-orange-950/30 border border-orange-500/20 text-neutral-200 rounded-bl-sm">
+                          <div className="flex items-center gap-2 mb-2 text-orange-400">
+                            <Sparkles size={14} />
+                            <span className="text-xs font-semibold uppercase tracking-wider">AI Host</span>
+                          </div>
+                          <div className="whitespace-pre-wrap leading-relaxed">{displayText}</div>
                         </div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              }
-            )}
+
+                        {msg.upsell && (
+                          <UpsellCard
+                            suggestion={msg.upsell}
+                            resolved={!!resolvedUpsells[msg.id]}
+                            accepted={resolvedUpsells[msg.id]?.accepted ?? false}
+                            onAccept={() => handleUpsellAccept(msg.id, msg.upsell.item)}
+                            onDecline={() => handleUpsellDecline(msg.id, msg.upsell.item)}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <div className="whitespace-pre-wrap leading-relaxed">{displayText}</div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
 
-          {/* Loading indicator */}
           {isLoading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex justify-start"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
               <div className="bg-orange-950/30 border border-orange-500/20 p-4 rounded-3xl rounded-bl-sm flex items-center gap-3">
                 <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
                 <span className="w-2 h-2 bg-orange-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -567,11 +601,10 @@ export default function Home() {
               </div>
             </motion.div>
           )}
-
           <div ref={messagesEndRef} />
         </div>
 
-        {/* ── Guardrail Error Banner ── */}
+        {/* Guardrail Banner */}
         <AnimatePresence>
           {guardrailError && (
             <motion.div
@@ -586,7 +619,7 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* ── Input Area ── */}
+        {/* Input Area */}
         <div className="p-4 md:p-6 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent">
           <form
             onSubmit={(e) => {
@@ -602,15 +635,11 @@ export default function Home() {
                 type="button"
                 onClick={toggleVoiceMode}
                 className={`text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors ${
-                  isVoiceMode
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+                  isVoiceMode ? "bg-blue-500/20 text-blue-400" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
                 }`}
               >
-                <Volume2 size={14} />{" "}
-                {isVoiceMode ? "Voice Mode Active" : "Enable Voice Mode"}
+                <Volume2 size={14} /> {isVoiceMode ? "Voice Mode Active" : "Enable Voice Mode"}
               </button>
-
               {isListening && (
                 <div className="flex items-center gap-2 text-red-400 text-xs font-medium animate-pulse">
                   <span className="w-2 h-2 rounded-full bg-red-500" /> Listening...
@@ -620,9 +649,7 @@ export default function Home() {
 
             <div className="relative flex items-center bg-neutral-900 border border-neutral-800 rounded-full shadow-xl focus-within:ring-2 focus-within:ring-orange-500/50 transition-all">
               {isVoiceMode ? (
-                <div className="flex-1 px-6 py-4 text-neutral-400 font-medium">
-                  {isListening ? "Speak now..." : "Tap the microphone to speak"}
-                </div>
+                <div className="flex-1 px-6 py-4 text-neutral-400 font-medium">{isListening ? "Speak now..." : "Tap the microphone to speak"}</div>
               ) : (
                 <input
                   ref={chatInputRef}
@@ -630,24 +657,15 @@ export default function Home() {
                   onChange={(e) => setInput(e.target.value)}
                   disabled={isVoiceMode}
                   className="flex-1 bg-transparent pl-6 py-4 focus:outline-none font-medium text-neutral-100 placeholder:text-neutral-500 disabled:opacity-50"
-                  placeholder={
-                    kitchenOrder
-                      ? "Chat while you wait..."
-                      : "Type your cravings (e.g. stressed and hungry)..."
-                  }
+                  placeholder={kitchenOrder ? "Chat while you wait..." : "Type your cravings (e.g. stressed and hungry)..."}
                 />
               )}
-
               <div className="pr-2 flex items-center">
                 {isVoiceMode ? (
                   <button
                     type="button"
                     onClick={toggleListening}
-                    className={`p-3 rounded-full transition-all ${
-                      isListening
-                        ? "bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse"
-                        : "bg-blue-500 text-white hover:bg-blue-400"
-                    }`}
+                    className={`p-3 rounded-full transition-all ${isListening ? "bg-red-500 text-white shadow-lg shadow-red-500/40 animate-pulse" : "bg-blue-500 text-white hover:bg-blue-400"}`}
                   >
                     {isListening ? <MicOff size={20} /> : <Mic size={20} />}
                   </button>
@@ -663,12 +681,7 @@ export default function Home() {
               </div>
             </div>
           </form>
-
-          <div className="text-center mt-4 text-xs text-neutral-600">
-            {kitchenOrder
-              ? "Kitchen staff preparing your order."
-              : "Using AI sentiment analysis to find exactly what hits the spot."}
-          </div>
+          <div className="text-center mt-4 text-xs text-neutral-600">{kitchenOrder ? "Kitchen staff preparing your order." : null}</div>
         </div>
       </div>
     </div>
