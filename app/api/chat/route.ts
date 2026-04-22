@@ -1,6 +1,6 @@
 //import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { streamText, createUIMessageStreamResponse, convertToModelMessages } from 'ai';
 import { detectInjection, sanitizeInput, validateOutput } from '@/app/lib/guardrails';
 
 export const maxDuration = 30;
@@ -61,7 +61,6 @@ export async function POST(req: Request) {
   const isVoiceMode = data?.mode === 'voice';
 
   // ── Server-side injection detection ───────────────────────────────────────
-  // Validate every user message in the conversation, not just the latest one.
   if (!Array.isArray(messages) || messages.length === 0) {
     return new Response(
       JSON.stringify({ error: 'No messages provided.' }),
@@ -69,9 +68,18 @@ export async function POST(req: Request) {
     );
   }
 
+  // SDK v6 sends UIMessage (parts array). Extract text for guardrail checks.
   for (const msg of messages) {
-    if (msg.role === 'user' && typeof msg.content === 'string') {
-      const sanitized = sanitizeInput(msg.content);
+    if (msg.role === 'user') {
+      // UIMessage format: text lives in parts[].text
+      const rawText: string = Array.isArray(msg.parts)
+        ? msg.parts
+            .filter((p: any) => p.type === 'text')
+            .map((p: any) => p.text ?? '')
+            .join('')
+        : (typeof msg.content === 'string' ? msg.content : '');
+
+      const sanitized = sanitizeInput(rawText);
       const check = detectInjection(sanitized);
       if (!check.safe) {
         return new Response(
@@ -79,10 +87,11 @@ export async function POST(req: Request) {
           { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
       }
-      // Replace raw content with sanitized version for the model
-      msg.content = sanitized;
     }
   }
+
+  // Convert UIMessage[] → ModelMessage[] that streamText understands
+  const modelMessages = await convertToModelMessages(messages);
 
   // ── Upsell history block ───────────────────────────────────────────────────
   const upsellHistoryBlock =
@@ -173,20 +182,24 @@ Maintain an energetic, empathetic, and culturally respectful tone appropriate fo
   const result = streamText({
     //model: google('models/gemini-2.0-flash'),
     model: groq('llama-3.3-70b-versatile'),
-    messages,
+    messages: modelMessages,   // converted ModelMessage[] format
     system: systemPrompt,
     temperature: 0.7,
-    onFinish: ({ text }) => {
-      // Output guardrail: log if the model tried to leak system info.
-      // (We can't block a streamed response after the fact, but we log it
-      //  for monitoring. In production, switch to a non-streaming endpoint
-      //  for full pre-flight output validation.)
-      const check = validateOutput(text);
-      if (!check.safe) {
-        console.warn('[ConvoSell Guardrail] Suspicious output detected:', check.reason);
-      }
-    },
   });
 
-  return result.toTextStreamResponse();
+  return createUIMessageStreamResponse({
+    stream: result.toUIMessageStream({
+      onFinish: ({ responseMessage }) => {
+        // Output guardrail: extract text from the response UIMessage parts
+        const text = (responseMessage?.parts ?? [])
+          .filter((p: any) => p.type === 'text')
+          .map((p: any) => p.text ?? '')
+          .join('');
+        const check = validateOutput(text);
+        if (!check.safe) {
+          console.warn('[ConvoSell Guardrail] Suspicious output detected:', check.reason);
+        }
+      },
+    }),
+  });
 }

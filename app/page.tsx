@@ -157,8 +157,15 @@ export default function Home() {
       },
     },
     onFinish: (message: any) => {
-      if (!message || typeof message.content !== "string") return;
-      const cleanContent = message.content
+      if (!message) return;
+      // SDK v6: content lives in parts[].text, not message.content directly
+      const rawText = typeof message.content === "string"
+        ? message.content
+        : (message.parts || [])
+            .filter((p: any) => p.type === "text")
+            .map((p: any) => p.text ?? "")
+            .join("");
+      const cleanContent = rawText
         .replace(/<KITCHEN_ORDER>[\s\S]*?<\/KITCHEN_ORDER>/g, "")
         .replace(/<UPSELL>[\s\S]*?<\/UPSELL>/g, "")
         .trim();
@@ -192,16 +199,16 @@ export default function Home() {
   // ── Guardrail-checked send helper ─────────────────────
   // Must be defined BEFORE the speech recognition useEffect that depends on it.
   const safeSendMessage = useCallback(
-    (msg: { role: "user"; content: string }) => {
+    (text: string) => {
       setGuardrailError(null);
-      const sanitized = sanitizeInput(msg.content);
+      const sanitized = sanitizeInput(text);
       const check = detectInjection(sanitized);
       if (!check.safe) {
         setGuardrailError(check.reason ?? "Message blocked by security guardrail.");
         setTimeout(() => setGuardrailError(null), 5000);
         return;
       }
-      sendMessage({ ...msg, content: sanitized });
+      sendMessage({ text: sanitized });
     },
     [sendMessage]
   );
@@ -221,7 +228,7 @@ export default function Home() {
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
           setIsListening(false);
-          safeSendMessage({ role: "user", content: transcript });
+          safeSendMessage(transcript);
         };
 
         recognitionRef.current.onerror = (event: any) => {
@@ -271,7 +278,14 @@ export default function Home() {
   const processedMessages = (messages || []).map((msg: any) => {
     if (msg.role !== "assistant") return msg;
 
-    let content = msg.content;
+    // SDK v6: text lives in parts[].text — fall back to msg.content for safety
+    let content: string = typeof msg.content === "string"
+      ? msg.content
+      : (msg.parts || [])
+          .filter((p: any) => p.type === "text")
+          .map((p: any) => p.text ?? "")
+          .join("");
+
     let upsell: UpsellSuggestion | null = null;
 
     const orderMatch = content.match(kitchenOrderRegex);
@@ -303,13 +317,13 @@ export default function Home() {
     setResolvedUpsells((prev) => ({ ...prev, [msgId]: { accepted: true } }));
     persistUpsellHistory([...upsellHistory, { item, accepted: true }]);
     // Upsell responses are system-generated — bypass guardrail check
-    sendMessage({ role: "user", content: `Yes please, add the ${item} to my order!` });
+    sendMessage({ text: `Yes please, add the ${item} to my order!` });
   };
 
   const handleUpsellDecline = (msgId: string, item: string) => {
     setResolvedUpsells((prev) => ({ ...prev, [msgId]: { accepted: false } }));
     persistUpsellHistory([...upsellHistory, { item, accepted: false }]);
-    sendMessage({ role: "user", content: `No thanks, I'll skip the ${item}.` });
+    sendMessage({ text: `No thanks, I'll skip the ${item}.` });
   };
 
   // ── Render ────────────────────────────────────────────
@@ -480,8 +494,15 @@ export default function Home() {
           {/* Messages */}
           <AnimatePresence initial={false}>
             {processedMessages?.map(
-              (msg: any) =>
-                msg.content.trim() && (
+              (msg: any) => {
+                // SDK v6: extract display text from parts or content
+                const displayText: string = typeof msg.content === "string"
+                  ? msg.content
+                  : (msg.parts || [])
+                      .filter((p: any) => p.type === "text")
+                      .map((p: any) => p.text ?? "")
+                      .join("");
+                return displayText.trim() && (
                   <motion.div
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -505,7 +526,7 @@ export default function Home() {
                               </span>
                             </div>
                             <div className="whitespace-pre-wrap leading-relaxed">
-                              {msg.content}
+                              {displayText}
                             </div>
                           </div>
 
@@ -522,12 +543,13 @@ export default function Home() {
                         </>
                       ) : (
                         <div className="whitespace-pre-wrap leading-relaxed">
-                          {msg.content}
+                          {displayText}
                         </div>
                       )}
                     </div>
                   </motion.div>
-                )
+                );
+              }
             )}
           </AnimatePresence>
 
@@ -570,7 +592,7 @@ export default function Home() {
             onSubmit={(e) => {
               e.preventDefault();
               if (!input.trim()) return;
-              safeSendMessage({ role: "user", content: input });
+              safeSendMessage(input);
               setInput("");
             }}
             className="max-w-4xl mx-auto flex flex-col gap-3"
