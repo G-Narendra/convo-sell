@@ -33,7 +33,7 @@ The current implementation balances functionality and efficiency by using a redu
 ## 📋 Prerequisites
 
 - **Node.js 18+** installed on your machine.
-- **Google Gemini API Key**: Obtain one from [Google AI Studio](https://aistudio.google.com/).
+- **Google Gemini API Key**: Obtain one from [Google AI Studio](https://aistudio.google.com/).[choose whatever API key works for you :).]
 
 ## ⚙️ Installation & Setup
 
