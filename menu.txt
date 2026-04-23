@@ -69,7 +69,7 @@ Tacos (Mexico)	Mexican	12	14
 Onion Rings (USA)	American	10	12
 Mozzarella Sticks (Italy)	European	12	14
 Chicken Nuggets (USA)	American	10	12
-Tiramisu (Italy)	European	15	18
+Tiramisu (Italy)	European	20	20
 Kunafa (Middle East)	Middle Eastern	20	16
 Baklava (Turkey)	Middle Eastern	25	14
 Gulab Jamun (India)	South Asian	20	10
