@@ -30,6 +30,8 @@ another feature of this program is that i added things to make it more customer 
 <img width="1600" height="765" alt="image" src="https://github.com/user-attachments/assets/f6c7fda7-aa63-43f4-8658-ee47dcf8f8d2" />
 - There is also a voice feature where you will be able to talk to it, it will listen to you and answer.
 
+  
+
 **HOW IT WAS BUILT**
 
 -for this to work we need some place for the customers to interact with the computer that place is called the  frontend- so for the frontend we used some website tools with the help of these tools we were able to edit    how the program looks 
