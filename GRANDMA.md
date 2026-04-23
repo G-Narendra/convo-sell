@@ -37,8 +37,11 @@ another feature of this program is that i added things to make it more customer 
 **HOW IT WAS BUILT**
 
 -for this to work we need some place for the customers to interact with the computer that place is called the  frontend- so for the frontend we used some website tools like next.js, react, typescript with the help of these tools we were able to edit how the program looks and interacts.
+
 -for the brain of everything i used a tool i mentioned before it is a very powerful AI model called LLaMA this helps us answer all the menu and customer preference related questions. It is good to note that when we seperatly tested this application all our memebers used diffrent apis so sometime we used GROQ other times we used google api key that uses the  GEMINI 2.5 FLASH ai model.
+
 -for this to work we need something that connects the brain and the frontend that something is called the backend this connection is handled by using the next.js, we also use a tool called turbopack to make sure the computer responds fast
+
 - we also used something called Vercel AI SDK so that our program can interact with the customer using the voice feature.the program uses usechat for the coversations and for the replies.
   
 
