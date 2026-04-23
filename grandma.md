@@ -12,6 +12,7 @@ But the problem with this tool is that can often give us made up things especial
 Sometime smart brains can also be confused or be tricked so that this doesnt happen i made sure that it will check the messages the customers are sending before it will use them and verfiy if it is harmful or strange or not basically it will be following stricit rules so that we can minimize the ammount of damage to the system. 
 
 **HOW IT WORKS** 
+
 so this tool will guide the cutomers to add another item when they are ordering something . 
 example: 
 if the customer has ordered bibimbap it will suggest to get an oreo shake 
@@ -23,10 +24,17 @@ another feature of this program is that i added things to make it more customer 
 <img width="2046" height="902" alt="image" src="https://github.com/user-attachments/assets/6ef0b187-8f89-4b1f-85ff-339b74127de3" />
 -you can give it your dietary prefrences and it will suggest based on your prefrences 
 <img width="2088" height="773" alt="image" src="https://github.com/user-attachments/assets/5f505fef-68a3-4296-9436-1093646386fe" />
-- you can even talk to it , it will listen to you and answer.
+- when you order is completed, the program will give you some games and puzzles to play so that the customer stays entertained.
+<img width="1600" height="781" alt="image" src="https://github.com/user-attachments/assets/7ebb67b8-1fcf-4468-8cc2-5a2445ee33b5" />
+<img width="1600" height="755" alt="image" src="https://github.com/user-attachments/assets/2ca7cb2b-bf3f-47fc-9d5e-86cef2606ce6" />
+<img width="1600" height="765" alt="image" src="https://github.com/user-attachments/assets/f6c7fda7-aa63-43f4-8658-ee47dcf8f8d2" />
+- There is also a voice feature where you will be able to talk to it, it will listen to you and answer.
 
 **HOW IT WAS BUILT**
-for this to work we need some place for the customers to interact with the computer that place is called teh frontend- 
+
+-for this to work we need some place for the customers to interact with the computer that place is called the  frontend- so for the frontend we used some website tools with the help of these tools we were able to edit    how the program looks 
+-for the brain of everything i used a to tool i mention before it is a very powerful AI model called LLaMA 
+-for this to work we need something that connects the brain and the frontend that something is called the      backend 
 
 
 
