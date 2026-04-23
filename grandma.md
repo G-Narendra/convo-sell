@@ -12,3 +12,21 @@ But the problem with this tool is that can often give us made up things especial
 Sometime smart brains can also be confused or be tricked so that this doesnt happen i made sure that it will check the messages the customers are sending before it will use them and verfiy if it is harmful or strange or not basically it will be following stricit rules so that we can minimize the ammount of damage to the system. 
 
 **HOW IT WORKS** 
+so this tool will guide the cutomers to add another item when they are ordering something . 
+example: 
+if the customer has ordered bibimbap it will suggest to get an oreo shake 
+<img width="1169" height="654" alt="image" src="https://github.com/user-attachments/assets/b970eedb-90ce-4ff4-bf61-27e16d0959a4" />
+it gently suggets items but it does not force them to buy anything.
+
+another feature of this program is that i added things to make it more customer friendly
+-it will give suggestion if you do not know what to order 
+<img width="2046" height="902" alt="image" src="https://github.com/user-attachments/assets/6ef0b187-8f89-4b1f-85ff-339b74127de3" />
+-you can give it your dietary prefrences and it will suggest based on your prefrences 
+<img width="2088" height="773" alt="image" src="https://github.com/user-attachments/assets/5f505fef-68a3-4296-9436-1093646386fe" />
+- you can even talk to it , it will listen to you and answer.
+
+**HOW IT WAS BUILT**
+for this to work we need some place for the customers to interact with the computer that place is called teh frontend- 
+
+
+
