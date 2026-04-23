@@ -34,6 +34,7 @@ another feature of this program is that i added things to make it more customer 
 
 
 
+
 **HOW IT WAS BUILT**
 
 -for this to work we need some place for the customers to interact with the computer that place is called the  frontend- so for the frontend we used some website tools like next.js, react, typescript with the help of these tools we were able to edit how the program looks and interacts.
