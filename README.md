@@ -1,7 +1,10 @@
 # Global Hub @ MDX (ConvoSell AI)
 ConvoSell AI is an AI-powered **influencing conversational agent** built for Global Hub @ Middlesex University Dubai, a multicultural cafeteria environment.
+
 Unlike traditional chatbots that passively respond to user queries, ConvoSell AI is designed to actively **influence customer decision-making** during the ordering process. The system engages users through natural language interaction, detects mood and dietary preferences, and strategically guides conversations toward specific menu items.
+
 By combining sentiment analysis, preference extraction, and persuasive recommendation techniques, the chatbot subtly nudges users toward alternative or higher-value food choices. It applies contextual upselling and behavioral influence strategies such as framing, suggestion sequencing, and adaptive responses to maximize order value while maintaining a natural user experience.
+
 The system ultimately converts the conversation into a structured, kitchen-ready order, bridging the gap between user intent and operational execution.
 
 ## 🚀 Key Features
