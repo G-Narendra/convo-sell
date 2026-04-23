@@ -22,6 +22,14 @@ The system ultimately converts the conversation into a structured, kitchen-ready
 - **UI Icons**: Lucide React.
 - **Voice**: Browser-native Web Speech API (SpeechRecognition & SpeechSynthesis).
 
+## Note on Menu Scope
+
+Due to token limitations associated with LLM usage, the menu integrated into the live system is intentionally limited to a smaller, optimized subset of items. 
+
+A significantly more extensive set of menu options is available in the menu.txt file; however, incorporating the full dataset directly into the conversational pipeline would increase token consumption and impact performance and cost efficiency.
+
+The current implementation balances functionality and efficiency by using a reduced menu size while maintaining relevant and context-aware recommendations.
+
 ## 📋 Prerequisites
 
 - **Node.js 18+** installed on your machine.
