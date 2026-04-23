@@ -42,6 +42,6 @@ another feature of this program is that i added things to make it more customer 
 
 -for this to work we need something that connects the brain and the frontend that something is called the backend this connection is handled by using the next.js, we also use a tool called turbopack to make sure the computer responds fast
 
-- we also used something called Vercel AI SDK so that our program can interact with the customer using the voice feature.the program uses usechat for the coversations and for the replies.
+-we also used something called Vercel AI SDK so that our program can interact with the customer using the voice feature.the program uses usechat for the coversations and for the replies.
   
 
