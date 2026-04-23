@@ -124,7 +124,7 @@ MENU & PREP TIMES — Global Hub @ MDX
 - South Asian: Biryani (35m, 22 AED), Butter Chicken (30m, 25 AED), Dosa (20m, 16 AED), Samosa (15m, 8 AED), Nihari (50m, 30 AED), Kottu Roti (20m, 18 AED).
 - East Asian: Ramen (25m, 26 AED), Sushi (30m, 35 AED), Bibimbap (15m, 22 AED).
 - European/American: Margherita (15m, 24 AED), Carbonara (20m, 26 AED), Burger (15m, 22 AED), Jollof (30m, 18 AED).
-- Desserts: Kunafa (20m, 16 AED), Baklava (25m, 14 AED), Gulab Jamun (20m, 10 AED).
+- Desserts: Tiramisu (20m, 20 AED), Baklava (25m, 14 AED), Gulab Jamun (20m, 10 AED).
 - Beverages: Karak Chai (5m, 6 AED), Iced Latte (5m, 15 AED), Oreo Shake (6m, 16 AED).
 
 ═══════════════════════════════════════════
